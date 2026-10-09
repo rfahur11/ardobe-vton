@@ -1,11 +1,14 @@
 import React from 'react';
 import { Sparkles, Cpu, Layers } from 'lucide-react';
+import { useTryOn } from '../context/TryOnContext';
 
 interface HeaderProps {
   onOpenArchitecture: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenArchitecture }) => {
+  const { isBackendConnected, gpuHealth } = useTryOn();
+
   return (
     <header className="app-header glass-panel">
       <div className="header-brand">
@@ -24,10 +27,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenArchitecture }) => {
       </div>
 
       <div className="header-actions">
+        {/* Dynamic Hardware & Backend Status Pill */}
         <div className="gpu-status-pill">
-          <div className="status-dot pulse-emerald"></div>
+          <div className={`status-dot ${isBackendConnected ? 'pulse-emerald' : 'pulse-amber'}`}></div>
           <Cpu size={14} className="text-secondary" />
-          <span className="gpu-label">TensorRT Video-UNet</span>
+          <span className="gpu-label">
+            {isBackendConnected && gpuHealth?.cuda_available
+              ? `${gpuHealth.device_name}`
+              : 'TensorRT Pipeline (Edge Mode)'}
+          </span>
           <span className="gpu-speed">36 FPS</span>
         </div>
 

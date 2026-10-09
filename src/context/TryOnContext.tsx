@@ -1,13 +1,13 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { 
   GarmentItem, 
   VideoSourceData, 
   TryOnJobState, 
   VideoViewMode, 
-  InferenceStage, 
   InferenceMetrics 
 } from '../types';
 import { PRESET_GARMENTS, PRESET_VIDEOS } from '../data/mockData';
+import { InferenceService, type GPUHealthResponse } from '../services/inferenceService';
 
 interface TryOnContextType {
   selectedGarment: GarmentItem;
@@ -23,6 +23,9 @@ interface TryOnContextType {
   jobState: TryOnJobState;
   startInference: () => void;
   resetInference: () => void;
+
+  gpuHealth: GPUHealthResponse | null;
+  isBackendConnected: boolean;
 
   viewMode: VideoViewMode;
   setViewMode: (mode: VideoViewMode) => void;
@@ -57,6 +60,9 @@ export const TryOnProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
 
+  const [gpuHealth, setGpuHealth] = useState<GPUHealthResponse | null>(null);
+  const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
+
   const [jobState, setJobState] = useState<TryOnJobState>({
     jobId: null,
     stage: 'completed',
@@ -73,7 +79,22 @@ export const TryOnProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     error: null,
   });
 
-  const timerRef = useRef<number | null>(null);
+  // Check backend hardware telemetry on mount & interval
+  useEffect(() => {
+    const checkBackend = async () => {
+      const health = await InferenceService.fetchGPUHealth();
+      if (health) {
+        setGpuHealth(health);
+        setIsBackendConnected(true);
+      } else {
+        setIsBackendConnected(false);
+      }
+    };
+
+    checkBackend();
+    const interval = setInterval(checkBackend, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   const addCustomGarment = (garment: GarmentItem) => {
     setAllGarments((prev) => [garment, ...prev]);
@@ -90,7 +111,7 @@ export const TryOnProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const resetInference = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
+    InferenceService.cancelActiveJob();
     setJobState({
       jobId: null,
       stage: 'idle',
@@ -103,73 +124,47 @@ export const TryOnProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const startInference = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-
-    const stages: { stage: InferenceStage; message: string; durationMs: number; progress: number }[] = [
-      { stage: 'ingesting', message: 'Decoding source video stream & extracting audio...', durationMs: 800, progress: 12 },
-      { stage: 'extracting_frames', message: 'Sampling keyframes & running spatial normalization...', durationMs: 900, progress: 28 },
-      { stage: 'densepose_tracking', message: 'Tracking 3D DensePose surface mesh & human parsing...', durationMs: 1200, progress: 48 },
-      { stage: 'garment_feature_encoding', message: 'Extracting DINOv2 texture latents & UV warping garment...', durationMs: 1100, progress: 68 },
-      { stage: 'diffusion_cross_attention', message: 'Spatial-Temporal Video Diffusion denoising (24 steps)...', durationMs: 1600, progress: 85 },
-      { stage: 'identity_restoration', message: 'ArcFace identity preservation & skin-tone blending...', durationMs: 900, progress: 95 },
-      { stage: 'video_multiplexing', message: 'FFmpeg H.264 temporal smoothing & remuxing final clip...', durationMs: 700, progress: 100 },
-    ];
-
-    const jobId = 'job_' + Math.random().toString(36).substring(2, 9);
-
     setJobState({
-      jobId,
+      jobId: null,
       stage: 'ingesting',
-      stageMessage: stages[0].message,
+      stageMessage: 'Connecting to inference gateway...',
       progressPercent: 5,
       outputVideoUrl: null,
       metrics: null,
       error: null,
     });
 
-    const runStage = (index: number) => {
-      if (index >= stages.length) {
-        const simulatedMetrics: InferenceMetrics = {
-          totalTimeSeconds: Number((Math.random() * 2 + 3.8).toFixed(1)),
-          temporalFlickerScore: Number((Math.random() * 3 + 96.5).toFixed(1)),
-          identityPreservationScore: Number((Math.random() * 2 + 97.8).toFixed(1)),
-          framesProcessed: Math.round((selectedVideo.durationSeconds || 6) * 24),
-          inferenceFps: Number((Math.random() * 5 + 32).toFixed(1)),
-        };
-
-        setJobState({
-          jobId,
+    InferenceService.submitVideoTryOnJob(
+      selectedVideo,
+      selectedGarment,
+      (partial) => {
+        setJobState((prev) => ({
+          ...prev,
+          ...partial,
+        }));
+      },
+      (outputVideoUrl: string, metrics: InferenceMetrics) => {
+        setJobState((prev) => ({
+          ...prev,
           stage: 'completed',
-          stageMessage: 'Video try-on synthesis completed with 98%+ temporal stability!',
+          stageMessage: 'Video try-on synthesis completed successfully!',
           progressPercent: 100,
-          outputVideoUrl: selectedVideo.videoUrl,
-          metrics: simulatedMetrics,
+          outputVideoUrl,
+          metrics,
           error: null,
-        });
-        return;
+        }));
+      },
+      (errorMessage: string) => {
+        setJobState((prev) => ({
+          ...prev,
+          stage: 'failed',
+          stageMessage: errorMessage,
+          progressPercent: 0,
+          error: errorMessage,
+        }));
       }
-
-      const st = stages[index];
-      setJobState((prev) => ({
-        ...prev,
-        stage: st.stage,
-        stageMessage: st.message,
-        progressPercent: st.progress,
-      }));
-
-      timerRef.current = window.setTimeout(() => {
-        runStage(index + 1);
-      }, st.durationMs);
-    };
-
-    runStage(0);
+    );
   };
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
 
   return (
     <TryOnContext.Provider
@@ -185,6 +180,8 @@ export const TryOnProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         jobState,
         startInference,
         resetInference,
+        gpuHealth,
+        isBackendConnected,
         viewMode,
         setViewMode,
         splitPosition,

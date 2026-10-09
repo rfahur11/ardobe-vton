@@ -7,9 +7,10 @@ import {
   Eye, 
   Sparkles, 
   Activity, 
-  CheckCircle,
-  Clock,
-  Zap
+  CheckCircle, 
+  Clock, 
+  Zap, 
+  Download 
 } from 'lucide-react';
 import { useTryOn } from '../context/TryOnContext';
 
@@ -162,6 +163,23 @@ export const VideoComparisonPlayer: React.FC = () => {
           >
             <Activity size={14} />
             <span>DensePose Mesh</span>
+          </button>
+
+          <button
+            className="tool-toggle-btn"
+            onClick={() => {
+              const a = document.createElement('a');
+              a.href = jobState.outputVideoUrl || selectedVideo.videoUrl;
+              a.target = '_blank';
+              a.download = `ardobe_${selectedGarment.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.mp4`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            }}
+            title="Download Video Hasil Virtual Try-On (MP4)"
+          >
+            <Download size={14} />
+            <span>Export MP4</span>
           </button>
 
           <button
