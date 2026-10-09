@@ -40,9 +40,11 @@
   - [x] Custom garment image upload (instant asset injection)
   - [x] Attribute cards (fabric, style tag, color dots)
 - [x] Dual-Mode Comparison Video Player (`src/components/VideoComparisonPlayer.tsx`):
+  - [x] Real-time Dynamic Uniform Compositor Layer (`src/components/GarmentCompositorLayer.tsx`) — fitting pakaian/seragam langsung ke tubuh subjek
   - [x] Interactive Before/After Split Slider dengan draggable handle
   - [x] Side-by-Side Synchronized Playback
   - [x] Try-On Result Only & Source Only modes
+  - [x] Fitting Fine-Tuner Controls (Offset Y dada, Scale ukuran baju, Opacity blending)
   - [x] Video Timeline scrubber, Play/Pause synchronization, Speed selector (0.5x, 1x, 1.5x, 2x)
   - [x] DensePose UV Mesh visualizer toggle
 - [x] AI Inference Pipeline Simulator:
