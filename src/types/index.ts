@@ -1,4 +1,4 @@
-export type GarmentCategory = 'all' | 'outerwear' | 'tops' | 'dresses_abaya' | 'hoodies';
+export type GarmentCategory = 'all' | 'uniforms' | 'outerwear' | 'tops' | 'dresses_abaya' | 'hoodies';
 
 export interface GarmentItem {
   id: string;
@@ -10,6 +10,8 @@ export interface GarmentItem {
   tag: string;
   fabric: string;
   colors: string[];
+  neckShape?: 'v_neck' | 'crew_neck' | 'collar' | 'hoodie' | 'robe';
+  torsoFit?: 'fitted' | 'loose' | 'oversized' | 'fullbody';
 }
 
 export type InputSourceType = 'sample' | 'webcam' | 'upload';

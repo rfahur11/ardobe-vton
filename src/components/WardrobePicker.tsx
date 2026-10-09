@@ -10,6 +10,7 @@ export const WardrobePicker: React.FC = () => {
 
   const categories: { key: GarmentCategory; label: string }[] = [
     { key: 'all', label: 'Semua Koleksi' },
+    { key: 'uniforms', label: 'Seragam (Uniform)' },
     { key: 'outerwear', label: 'Jaket & Blazer' },
     { key: 'dresses_abaya', label: 'Abaya & Gaun' },
     { key: 'hoodies', label: 'Hoodie' },

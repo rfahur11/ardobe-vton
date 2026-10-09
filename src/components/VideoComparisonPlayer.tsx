@@ -10,9 +10,12 @@ import {
   CheckCircle, 
   Clock, 
   Zap, 
-  Download 
+  Download,
+  SlidersHorizontal,
+  X
 } from 'lucide-react';
 import { useTryOn } from '../context/TryOnContext';
+import { GarmentCompositorLayer } from './GarmentCompositorLayer';
 
 export const VideoComparisonPlayer: React.FC = () => {
   const {
@@ -39,6 +42,12 @@ export const VideoComparisonPlayer: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isDraggingSlider, setIsDraggingSlider] = useState<boolean>(false);
   const [showDensePoseMesh, setShowDensePoseMesh] = useState<boolean>(false);
+
+  // Fitting Adjuster states (for fine-tuning garment position on any body)
+  const [showFittingControls, setShowFittingControls] = useState<boolean>(false);
+  const [fittingOffsetY, setFittingOffsetY] = useState<number>(30); // % from top
+  const [fittingScale, setFittingScale] = useState<number>(1.05);
+  const [fittingOpacity, setFittingOpacity] = useState<number>(96);
 
   // Sync play/pause states
   useEffect(() => {
@@ -156,6 +165,17 @@ export const VideoComparisonPlayer: React.FC = () => {
         </div>
 
         <div className="toolbar-right-actions">
+          {/* Fitting Adjuster Toggle */}
+          <button
+            className={`tool-toggle-btn ${showFittingControls ? 'toggle-on' : ''}`}
+            onClick={() => setShowFittingControls(!showFittingControls)}
+            title="Sesuaikan posisi tinggi dan ukuran pakaian"
+          >
+            <SlidersHorizontal size={14} />
+            <span>Fitting Adjuster</span>
+          </button>
+
+          {/* DensePose Mesh Toggle */}
           <button
             className={`tool-toggle-btn ${showDensePoseMesh ? 'toggle-on' : ''}`}
             onClick={() => setShowDensePoseMesh(!showDensePoseMesh)}
@@ -165,6 +185,7 @@ export const VideoComparisonPlayer: React.FC = () => {
             <span>DensePose Mesh</span>
           </button>
 
+          {/* Export MP4 */}
           <button
             className="tool-toggle-btn"
             onClick={() => {
@@ -182,6 +203,7 @@ export const VideoComparisonPlayer: React.FC = () => {
             <span>Export MP4</span>
           </button>
 
+          {/* Generate Try-On */}
           <button
             className="btn-trigger-vton"
             onClick={startInference}
@@ -207,7 +229,7 @@ export const VideoComparisonPlayer: React.FC = () => {
         {/* Render Stage 1: SPLIT SLIDER MODE */}
         {viewMode === 'split_slider' && (
           <div className="split-view-container">
-            {/* Background: Synthesized Result Video */}
+            {/* Background: Synthesized Result Video with Dynamic Uniform Layer */}
             <div className="split-layer layer-result">
               <video
                 ref={resultVideoRef}
@@ -217,9 +239,19 @@ export const VideoComparisonPlayer: React.FC = () => {
                 muted
                 className="viewport-video video-styled-tryon"
               />
+
+              {/* Dynamic Garment / Uniform Overlay */}
+              <GarmentCompositorLayer
+                garment={selectedGarment}
+                offsetY={fittingOffsetY}
+                scale={fittingScale}
+                opacity={fittingOpacity}
+                isGenerating={isRendering}
+              />
+
               <div className="viewport-badge badge-result">
                 <Sparkles size={12} />
-                <span>Ardobe Video Inpainting ({selectedGarment.name})</span>
+                <span>Wearing: {selectedGarment.name}</span>
               </div>
             </div>
 
@@ -240,17 +272,6 @@ export const VideoComparisonPlayer: React.FC = () => {
               />
               <div className="viewport-badge badge-source">
                 <span>Original ({selectedVideo.name})</span>
-              </div>
-            </div>
-
-            {/* Garment accent thumbnail in try-on view */}
-            <div 
-              className="garment-accent-overlay"
-              style={{ left: `${splitPosition}%` }}
-            >
-              <div className="watermark-garment">
-                <img src={selectedGarment.thumbnailUrl} alt="Garment sample" className="watermark-thumb" />
-                <span className="watermark-text">{selectedGarment.brandOrStyle}</span>
               </div>
             </div>
 
@@ -299,6 +320,15 @@ export const VideoComparisonPlayer: React.FC = () => {
                 muted
                 className="viewport-video video-styled-tryon"
               />
+
+              {/* Dynamic Garment / Uniform Overlay */}
+              <GarmentCompositorLayer
+                garment={selectedGarment}
+                offsetY={fittingOffsetY}
+                scale={fittingScale}
+                opacity={fittingOpacity}
+                isGenerating={isRendering}
+              />
             </div>
           </div>
         )}
@@ -316,6 +346,16 @@ export const VideoComparisonPlayer: React.FC = () => {
               onLoadedMetadata={handleLoadedMetadata}
               className="viewport-video video-styled-tryon"
             />
+
+            {/* Dynamic Garment / Uniform Overlay */}
+            <GarmentCompositorLayer
+              garment={selectedGarment}
+              offsetY={fittingOffsetY}
+              scale={fittingScale}
+              opacity={fittingOpacity}
+              isGenerating={isRendering}
+            />
+
             <div className="viewport-badge badge-result">
               <Sparkles size={12} />
               <span>Wearing: {selectedGarment.name}</span>
@@ -328,6 +368,67 @@ export const VideoComparisonPlayer: React.FC = () => {
           <div className="densepose-mesh-grid">
             <div className="mesh-indicator-pill">
               DensePose IUV Surface Sampling: 24 Keyframes Active
+            </div>
+          </div>
+        )}
+
+        {/* Floating Fitting Controls Panel */}
+        {showFittingControls && (
+          <div className="fitting-adjuster-panel">
+            <div className="adjuster-header">
+              <h4>Fitting Fine-Tuner</h4>
+              <button
+                className="btn-close-sm"
+                onClick={() => setShowFittingControls(false)}
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            <div className="adjuster-row">
+              <div className="adjuster-label-row">
+                <span>Tinggi Dada (Offset Y)</span>
+                <span>{fittingOffsetY}%</span>
+              </div>
+              <input
+                type="range"
+                min={18}
+                max={45}
+                value={fittingOffsetY}
+                onChange={(e) => setFittingOffsetY(Number(e.target.value))}
+                className="adjuster-slider"
+              />
+            </div>
+
+            <div className="adjuster-row">
+              <div className="adjuster-label-row">
+                <span>Ukuran Baju (Scale)</span>
+                <span>{fittingScale.toFixed(2)}x</span>
+              </div>
+              <input
+                type="range"
+                min={0.8}
+                max={1.4}
+                step={0.02}
+                value={fittingScale}
+                onChange={(e) => setFittingScale(Number(e.target.value))}
+                className="adjuster-slider"
+              />
+            </div>
+
+            <div className="adjuster-row">
+              <div className="adjuster-label-row">
+                <span>Intensitas Blending</span>
+                <span>{fittingOpacity}%</span>
+              </div>
+              <input
+                type="range"
+                min={60}
+                max={100}
+                value={fittingOpacity}
+                onChange={(e) => setFittingOpacity(Number(e.target.value))}
+                className="adjuster-slider"
+              />
             </div>
           </div>
         )}
