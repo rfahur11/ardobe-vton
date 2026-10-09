@@ -53,10 +53,14 @@
   - [x] Edge vs Cloud Latency Budget table
   - [x] QA automated quality gates (SSIM, CLIP-I, ArcFace similarity)
 
-### Phase 2: AI/ML Backend Architecture & Deployment Specs
-- [ ] Python FastAPI inference bridge skeleton (`inference_server/`)
-- [ ] ComfyUI / Replicate API webhook connector
-- [ ] Model Weights Dockerfile (TensorRT-LLM / TorchScript)
+### Phase 2: AI/ML Backend Architecture & MLOps (Agent Orion & Dante)
+- [x] Detailed Deep Learning & MLOps Blueprint ([`docs/model_pipeline_specs.md`](file:///d:/porto/ardobe-vton/docs/model_pipeline_specs.md))
+- [x] Python FastAPI Async Inference Gateway ([`inference_server/main.py`](file:///d:/porto/ardobe-vton/inference_server/main.py))
+- [x] VTON Temporal Video Pipeline Orchestrator ([`inference_server/pipelines/vton_video_pipeline.py`](file:///d:/porto/ardobe-vton/inference_server/pipelines/vton_video_pipeline.py))
+- [x] Dante's MLOps Model Quantizer & Benchmarking Foundry ([`inference_server/mlops/quantizer.py`](file:///d:/porto/ardobe-vton/inference_server/mlops/quantizer.py))
+- [x] Telemetry, Hardware VRAM Monitor & Quality Gates ([`inference_server/core/telemetry.py`](file:///d:/porto/ardobe-vton/inference_server/core/telemetry.py))
+- [x] Production CUDA 12.2 Docker Container ([`inference_server/Dockerfile.gpu`](file:///d:/porto/ardobe-vton/inference_server/Dockerfile.gpu))
+- [x] Pydantic Strict Data Contracts & Schemas ([`inference_server/schemas/api_schemas.py`](file:///d:/porto/ardobe-vton/inference_server/schemas/api_schemas.py))
 
 ### Phase 3: Mobile Native Adaptation
 - [ ] React Native / Flutter Shell wrapper

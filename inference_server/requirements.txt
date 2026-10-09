@@ -1,0 +1,19 @@
+# Core FastAPI & Web Server
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+sse-starlette>=2.0.0
+python-multipart>=0.0.9
+
+# Deep Learning & Computer Vision (Orion)
+numpy>=1.26.0
+Pillow>=10.2.0
+
+# Optional PyTorch & CUDA dependencies (For Cloud GPU deployment)
+# torch>=2.2.0 --index-url https://download.pytorch.org/whl/cu121
+# torchvision>=0.17.0
+# opencv-python-headless>=4.9.0
+# diffusers>=0.27.0
+# transformers>=4.38.0
+# accelerate>=0.28.0

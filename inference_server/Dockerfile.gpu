@@ -1,0 +1,50 @@
+# =========================================================================
+# Ardobe AI - Production CUDA Inference Container
+# Maintained by: Agent Dante (MLOps Lead) & Agent Orion (Vision Lead)
+# =========================================================================
+
+FROM nvidia/cuda:12.2.2-runtime-ubuntu22.04
+
+# Prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    TORCH_CUDA_ARCH_LIST="8.0;8.6;8.9;9.0" \
+    FORCE_CUDA="1"
+
+# System packages & FFmpeg
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    python3-pip \
+    ffmpeg \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up working directory
+WORKDIR /app
+
+# Create virtual environment
+RUN python3.11 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install Python requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy application source code
+COPY . .
+
+# Expose FastAPI port
+EXPOSE 8000
+
+# Healthcheck probe
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:8000/health/gpu || exit 1
+
+# Start Uvicorn production server
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
