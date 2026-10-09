@@ -1,6 +1,7 @@
 # 🌐 SYSTEM STATE: Ardobe AI (Video & Photo Virtual Try-On)
 
 > **Repository / Directory**: `d:\porto\ardobe-vton`  
+> **GitHub Remote**: [https://github.com/rfahur11/ardobe-vton.git](https://github.com/rfahur11/ardobe-vton.git)  
 > **Last Updated**: 2026-10-09  
 > **Current Version**: v0.1.0 (Alpha Prototype - Active & Live)  
 > **Active Environment**: Development (Vite + React 19 + TypeScript + Vanilla CSS)  
