@@ -1,61 +1,6 @@
 import type { GarmentItem, VideoSourceData } from '../types';
 
 export const PRESET_GARMENTS: GarmentItem[] = [
-  // --- UNIFORMS SECTION ---
-  {
-    id: 'uniform-medical-scrub',
-    name: 'Clinical Medical Scrub Uniform',
-    category: 'uniforms',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=600&auto=format&fit=crop&q=80',
-    hdGarmentUrl: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=1200&auto=format&fit=crop&q=80',
-    brandOrStyle: 'Healthcare & Hospital Pro',
-    tag: 'Uniform Special',
-    fabric: 'Antimicrobial Poly-Cotton Stretch Twill',
-    colors: ['#0f766e', '#0369a1', '#1e293b'],
-    neckShape: 'v_neck',
-    torsoFit: 'fitted',
-  },
-  {
-    id: 'uniform-pilot-captain',
-    name: 'Airline Captain Pilot Uniform',
-    category: 'uniforms',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
-    hdGarmentUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&auto=format&fit=crop&q=80',
-    brandOrStyle: 'Aviation Commander Sartorial',
-    tag: 'Executive',
-    fabric: 'Fine Wool Gabardine with Gold Trim',
-    colors: ['#0f172a', '#d4af37', '#ffffff'],
-    neckShape: 'collar',
-    torsoFit: 'fitted',
-  },
-  {
-    id: 'uniform-culinary-chef',
-    name: 'Executive Chef Master Jacket',
-    category: 'uniforms',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=600&auto=format&fit=crop&q=80',
-    hdGarmentUrl: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=1200&auto=format&fit=crop&q=80',
-    brandOrStyle: 'Haute Cuisine Professional',
-    tag: 'Culinary Uniform',
-    fabric: '100% Breathable Egyptian Cotton Drill',
-    colors: ['#f8fafc', '#1e293b', '#b91c1c'],
-    neckShape: 'collar',
-    torsoFit: 'regular' as any,
-  },
-  {
-    id: 'uniform-security-officer',
-    name: 'Tactical Security Officer Uniform',
-    category: 'uniforms',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1544642899-f0d45082d797?w=600&auto=format&fit=crop&q=80',
-    hdGarmentUrl: 'https://images.unsplash.com/photo-1544642899-f0d45082d797?w=1200&auto=format&fit=crop&q=80',
-    brandOrStyle: 'Law & Security Operations',
-    tag: 'Duty Wear',
-    fabric: 'Ripstop Heavy Blend with Dual Chest Pockets',
-    colors: ['#1e293b', '#0f172a', '#475569'],
-    neckShape: 'collar',
-    torsoFit: 'fitted',
-  },
-
-  // --- WARDROBE FASHION SECTION ---
   {
     id: 'garment-cyber-bomber',
     name: 'Neo-Tokyo Techwear Bomber',
@@ -66,8 +11,6 @@ export const PRESET_GARMENTS: GarmentItem[] = [
     tag: 'Trending',
     fabric: 'Waterproof Matte Ripstop & Cordura',
     colors: ['#1e1e24', '#ff0055', '#3a86ff'],
-    neckShape: 'collar',
-    torsoFit: 'loose',
   },
   {
     id: 'garment-emerald-abaya',
@@ -79,8 +22,6 @@ export const PRESET_GARMENTS: GarmentItem[] = [
     tag: 'Ardobe Special',
     fabric: 'Crepe Silk with Gold Thread Hem',
     colors: ['#064e3b', '#d4af37', '#022c22'],
-    neckShape: 'robe',
-    torsoFit: 'fullbody',
   },
   {
     id: 'garment-oversized-hoodie',
@@ -92,8 +33,6 @@ export const PRESET_GARMENTS: GarmentItem[] = [
     tag: 'Popular',
     fabric: '450 GSM French Terry Cotton',
     colors: ['#e2dedb', '#4a403a', '#1a1a1a'],
-    neckShape: 'hoodie',
-    torsoFit: 'oversized',
   },
   {
     id: 'garment-milan-blazer',
@@ -105,8 +44,6 @@ export const PRESET_GARMENTS: GarmentItem[] = [
     tag: 'Classic',
     fabric: 'Super 130s Merino Wool',
     colors: ['#1c2833', '#2c3e50', '#7f8c8d'],
-    neckShape: 'collar',
-    torsoFit: 'fitted',
   },
   {
     id: 'garment-street-tee',
@@ -118,8 +55,6 @@ export const PRESET_GARMENTS: GarmentItem[] = [
     tag: 'Summer Pick',
     fabric: '100% Combed Ringspun Cotton',
     colors: ['#374151', '#1f2937', '#9ca3af'],
-    neckShape: 'crew_neck',
-    torsoFit: 'loose',
   },
 ];
 
